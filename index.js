@@ -16,4 +16,59 @@ app.get('/employees/:id',(req,res)=>{
     })
 }) 
 
+app.delete('/employees/:id',(req,res)=>{
+    connection.query('DELETE FROM employee Where id=?',[req.params.id],(err,rows)=>{
+        if(err){
+            console.log(err)
+        }else{
+            res.send(rows)
+        }
+    })
+}) 
+
+app.post('/employees',(req,res)=>{
+    var emp = req.body
+    var empData = [emp.name,emp.salary]
+    connection.query('INSERT INTO employee(name,salary) values(?)',[empData],(err,rows)=>{
+        if(err){
+            console.log(err)
+        }else{
+            res.send(rows)
+        }
+    })
+}) 
+
+app.patch('/employees',(req,res)=>{
+    var emp = req.body
+    connection.query('UPDATE employee SET ? WHERE id='+emp.id,[emp],(err,rows)=>{
+        if(err){
+            console.log(err)
+        }else{
+            res.send(rows)
+        }
+    })
+}) 
+
+app.put('/employees',(req,res)=>{
+    var emp = req.body
+    connection.query('UPDATE employee SET ? WHERE id='+emp.id,[emp],(err,rows)=>{
+        if(err){
+            console.log(err)
+        }else{
+            if(rows.affectedRows==0){
+                var empData = [emp.name,emp.salary]
+                connection.query('INSERT INTO employee(name,salary) values(?)',[empData],(err,rows)=>{
+                    if(err){
+                        console.log(err)
+                    }else{
+                        res.send(rows)
+                    }
+                })
+            }else{
+                res.send(rows)
+            }
+        }
+    })
+})
+
 app.listen(3000,()=>console.log('Express server is running on port 3000'))
